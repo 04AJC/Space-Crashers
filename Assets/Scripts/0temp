@@ -1,0 +1,63 @@
+using UnityEngine;
+
+public class EnemyCombat : MonoBehaviour
+{
+    public float attackRange = 1f;
+    public int attackDamage = 5;
+    public float attackRate = 1f;
+    
+    [Header("Knockback")]
+    public float knockbackPower = 30f;
+
+    private float nextAttackTime = 0f;
+    private Transform player;
+    private PlayerHealth playerHealth;
+
+    void Start()
+    {
+        player = GameObject.FindWithTag("Player").transform;
+        if (player != null)
+        {
+            playerHealth = player.GetComponent<PlayerHealth>();
+            Debug.Log("Found player health component: " + (playerHealth != null));
+        }
+        else
+        {
+            Debug.LogError("Could not find player with tag 'Player'");
+        }
+    }
+
+    void Update()
+    {
+        if (player != null && playerHealth != null && Time.time >= nextAttackTime)
+        {
+            float distance = Vector2.Distance(transform.position, player.position);
+
+            if (distance <= attackRange)
+            {
+                Attack();
+                nextAttackTime = Time.time + 1f / attackRate;
+            }
+        }
+    }
+
+    void Attack()
+    {
+        Debug.Log("=== ENEMY ATTACK STARTED ===");
+        Debug.Log("Knockback Power: " + knockbackPower);
+        Debug.Log("Player Health Ref: " + (playerHealth != null));
+        
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(attackDamage);
+            Debug.Log("Calling ApplyKnockback with power: " + knockbackPower);
+            playerHealth.ApplyKnockback(transform.position, knockbackPower);
+            DamagePopup.Create(player.position, attackDamage);
+        }
+        else
+        {
+            Debug.LogError("PlayerHealth is null - cannot apply knockback!");
+        }
+        Debug.Log("=== ENEMY ATTACK ENDED ===");
+    }
+}
