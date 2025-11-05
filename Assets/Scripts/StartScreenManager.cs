@@ -10,25 +10,22 @@ public class StartScreenManager : MonoBehaviour
     {
         startButton.onClick.AddListener(StartGame);
         quitButton.onClick.AddListener(QuitGame);
-        
-        Debug.Log("StartScreenManager Started");
     }
 
     void StartGame()
     {
-        Debug.Log("Start button clicked!");
+        SceneTransitionManager.instance.LoadSceneWithFade("GameScene");
         
-        // Check if the SceneTransitionManager exists
-        if (SceneTransitionManager.instance == null)
+        // Spawn player at car when scene loads
+        Invoke(nameof(DelayedSpawn), 0.5f);
+    }
+
+    void DelayedSpawn()
+    {
+        if (PlayerSpawner.instance != null)
         {
-            Debug.LogError("SceneTransitionManager instance is NULL!");
-            // Fallback: load directly without fade
-            UnityEngine.SceneManagement.SceneManager.LoadScene("ModeSelectScene");
-            return;
+            PlayerSpawner.instance.PositionPlayerAtSpawn();
         }
-        
-        Debug.Log("Calling LoadSceneWithFade...");
-        SceneTransitionManager.instance.LoadSceneWithFade("ModeSelectScene");
     }
 
     void QuitGame()
